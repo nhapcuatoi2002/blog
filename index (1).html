@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Blog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#121212',
+                        darkcard: '#1E1E1E',
+                        darkhover: '#2D2D2D'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .blog-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .featured-post {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%23718096'/%3E%3Cpath d='M0 200 L800 200' stroke='%23CBD5E0' stroke-width='2' stroke-dasharray='10,10'/%3E%3Cpath d='M400 0 L400 400' stroke='%23CBD5E0' stroke-width='2' stroke-dasharray='10,10'/%3E%3Ccircle cx='400' cy='200' r='100' fill='%234A5568' stroke='%23E2E8F0' stroke-width='4'/%3E%3Cpath d='M350 150 L450 250 M450 150 L350 250' stroke='%23E2E8F0' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* Dark mode toggle */
+        .toggle-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .toggle-slot {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            border-radius: 15px;
+            background-color: #e9eef2;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dark .toggle-slot {
+            background-color: #374151;
+        }
+
+        .toggle-button {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #ffbb52;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e27c00;
+        }
+
+        .toggle-checkbox:checked + .toggle-slot .toggle-button {
+            transform: translateX(30px);
+            background-color: #485367;
+            color: #a9c1f5;
+        }
+        
+        /* Smooth transition for all elements */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-darkbg dark:text-gray-200">
+    <!-- Header -->
+    <header class="bg-white dark:bg-darkcard shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-blue-600 dark:text-blue-400">MyBlog</a>
+            
+            <div class="hidden md:flex space-x-6">
+                <a href="#" class="nav-link text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">Home</a>
+                <a href="#" class="nav-link text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">Articles</a>
+                <a href="#" class="nav-link text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">Categories</a>
+                <a href="#" class="nav-link text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">About</a>
+                <a href="#" class="nav-link text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">Contact</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Dark Mode Toggle -->
+                <label class="toggle hidden md:flex items-center">
+                    <input type="checkbox" id="dark-mode-toggle" class="toggle-checkbox">
+                    <div class="toggle-slot">
+                        <div class="toggle-button">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                    </div>
+                </label>
+                
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search..." class="pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden bg-white dark:bg-darkcard py-4 px-4 hidden">
+            <div class="flex flex-col space-y-3">
+                <a href="#" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">Home</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">Articles</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">Categories</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">About</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium">Contact</a>
+                <div class="relative mt-2">
+                    <input type="text" placeholder="Search..." class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                <!-- Mobile Dark Mode Toggle -->
+                <div class="flex items-center justify-between mt-2">
+                    <span class="text-gray-700 dark:text-gray-300">Dark Mode</span>
+                    <label class="toggle flex items-center">
+                        <input type="checkbox" id="mobile-dark-mode-toggle" class="toggle-checkbox">
+                        <div class="toggle-slot">
+                            <div class="toggle-button">
+                                <i class="fas fa-sun"></i>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Featured Post -->
+    <section class="featured-post h-96 flex items-center justify-center text-white mb-12">
+        <div class="container mx-auto px-4 text-center">
+            <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">Featured</span>
+            <h1 class="text-4xl md:text-5xl font-bold mt-4 mb-6">The Art of Mindful Living</h1>
+            <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8">Discover how mindfulness can transform your daily life and bring peace to your busy schedule.</p>
+            <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300">Read Article</a>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Blog Posts -->
+            <div class="w-full md:w-2/3">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">Latest Articles</h2>
+                
+                <!-- Blog Post 1 -->
+                <article class="blog-card bg-white dark:bg-darkcard rounded-xl overflow-hidden shadow-md dark:shadow-gray-900/30 mb-8">
+                    <div class="h-64 bg-gray-200 dark:bg-gray-700 relative">
+                        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+                            <rect width="800" height="400" fill="#4A5568" class="dark:fill-gray-800"/>
+                            <circle cx="400" cy="200" r="100" fill="#2D3748" class="dark:fill-gray-700" stroke="#E2E8F0" stroke-width="4"/>
+                            <path d="M350 170 L450 170 M350 200 L450 200 M350 230 L450 230" stroke="#E2E8F0" stroke-width="10" stroke-linecap="round"/>
+                        </svg>
+                        <span class="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">Technology</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">The Future of Artificial Intelligence</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Exploring how AI is reshaping industries and what we can expect in the coming years as technology continues to evolve.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">John Doe</span>
+                            </div>
+                            <span class="text-sm text-gray-500 dark:text-gray-500">June 12, 2023</span>
+                        </div>
+                        <a href="#" class="block mt-4 text-blue-600 dark:text-blue-400 font-medium hover:underline">Read More →</a>
+                    </div>
+                </article>
+                
+                <!-- Blog Post 2 -->
+                <article class="blog-card bg-white dark:bg-darkcard rounded-xl overflow-hidden shadow-md dark:shadow-gray-900/30 mb-8">
+                    <div class="h-64 bg-gray-200 dark:bg-gray-700 relative">
+                        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+                            <rect width="800" height="400" fill="#68D391" class="dark:fill-green-900"/>
+                            <circle cx="250" cy="200" r="100" fill="#48BB78" class="dark:fill-green-800"/>
+                            <circle cx="550" cy="200" r="100" fill="#48BB78" class="dark:fill-green-800"/>
+                            <path d="M250 150 Q400 100 550 150" stroke="#2F855A" class="dark:stroke-green-700" stroke-width="10" fill="none"/>
+                            <path d="M250 250 Q400 300 550 250" stroke="#2F855A" class="dark:stroke-green-700" stroke-width="10" fill="none"/>
+                        </svg>
+                        <span class="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">Health</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">Nutrition Myths Debunked</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Separating fact from fiction in the world of nutrition and revealing the truth behind common dietary misconceptions.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Jane Smith</span>
+                            </div>
+                            <span class="text-sm text-gray-500 dark:text-gray-500">June 8, 2023</span>
+                        </div>
+                        <a href="#" class="block mt-4 text-blue-600 dark:text-blue-400 font-medium hover:underline">Read More →</a>
+                    </div>
+                </article>
+                
+                <!-- Blog Post 3 -->
+                <article class="blog-card bg-white dark:bg-darkcard rounded-xl overflow-hidden shadow-md dark:shadow-gray-900/30 mb-8">
+                    <div class="h-64 bg-gray-200 dark:bg-gray-700 relative">
+                        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+                            <rect width="800" height="400" fill="#FBD38D" class="dark:fill-yellow-900"/>
+                            <rect x="200" y="100" width="400" height="200" fill="#F6AD55" class="dark:fill-yellow-800" stroke="#ED8936" class="dark:stroke-yellow-700" stroke-width="10"/>
+                            <circle cx="300" cy="150" r="30" fill="#FEEBC8" class="dark:fill-yellow-200"/>
+                            <circle cx="500" cy="150" r="30" fill="#FEEBC8" class="dark:fill-yellow-200"/>
+                            <path d="M350 250 Q400 300 450 250" stroke="#FEEBC8" class="dark:stroke-yellow-200" stroke-width="10" fill="none"/>
+                        </svg>
+                        <span class="absolute top-4 left-4 bg-yellow-600 text-white px-3 py-1 rounded-full text-sm font-medium">Lifestyle</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">Minimalism: Living With Less</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">How embracing minimalism can lead to greater happiness, reduced stress, and a more meaningful connection with the things you own.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Alex Johnson</span>
+                            </div>
+                            <span class="text-sm text-gray-500 dark:text-gray-500">June 5, 2023</span>
+                        </div>
+                        <a href="#" class="block mt-4 text-blue-600 dark:text-blue-400 font-medium hover:underline">Read More →</a>
+                    </div>
+                </article>
+                
+                <!-- Pagination -->
+                <div class="flex justify-center mt-12">
+                    <nav class="inline-flex rounded-md shadow">
+                        <a href="#" class="py-2 px-4 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-l-md hover:bg-gray-50 dark:hover:bg-gray-600">Previous</a>
+                        <a href="#" class="py-2 px-4 bg-blue-600 border border-blue-600 text-white">1</a>
+                        <a href="#" class="py-2 px-4 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">2</a>
+                        <a href="#" class="py-2 px-4 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">3</a>
+                        <a href="#" class="py-2 px-4 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-r-md hover:bg-gray-50 dark:hover:bg-gray-600">Next</a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="w-full md:w-1/3">
+                <!-- About Me -->
+                <div class="bg-white dark:bg-darkcard rounded-xl shadow-md dark:shadow-gray-900/30 p-6 mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">About Me</h3>
+                    <div class="flex items-center mb-4">
+                        <div class="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 text-3xl">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-bold text-gray-800 dark:text-gray-200">John Blogger</h4>
+                            <p class="text-gray-600 dark:text-gray-400">Content Creator & Writer</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">Passionate about sharing knowledge and insights on technology, health, and lifestyle topics. Join me on this journey of discovery!</p>
+                    <div class="flex space-x-3">
+                        <a href="#" class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-700">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center text-white hover:bg-blue-500">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-white hover:bg-pink-700">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-blue-900">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Categories -->
+                <div class="bg-white dark:bg-darkcard rounded-xl shadow-md dark:shadow-gray-900/30 p-6 mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Categories</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" class="flex justify-between items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                                <span>Technology</span>
+                                <span class="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-1 rounded-full text-xs">12</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex justify-between items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                                <span>Health & Wellness</span>
+                                <span class="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 px-2 py-1 rounded-full text-xs">8</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex justify-between items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                                <span>Lifestyle</span>
+                                <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300 px-2 py-1 rounded-full text-xs">15</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex justify-between items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                                <span>Travel</span>
+                                <span class="bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 px-2 py-1 rounded-full text-xs">6</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex justify-between items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                                <span>Finance</span>
+                                <span class="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 px-2 py-1 rounded-full text-xs">4</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Popular Posts -->
+                <div class="bg-white dark:bg-darkcard rounded-xl shadow-md dark:shadow-gray-900/30 p-6 mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Popular Posts</h3>
+                    <div class="space-y-4">
+                        <a href="#" class="flex items-center group">
+                            <div class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-md flex-shrink-0 overflow-hidden">
+                                <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                                    <rect width="100" height="100" fill="#4A5568" class="dark:fill-gray-800"/>
+                                    <circle cx="50" cy="50" r="30" fill="#2D3748" class="dark:fill-gray-700"/>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">10 Tips for Better Sleep</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-500">June 2, 2023</p>
+                            </div>
+                        </a>
+                        <a href="#" class="flex items-center group">
+                            <div class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-md flex-shrink-0 overflow-hidden">
+                                <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                                    <rect width="100" height="100" fill="#68D391" class="dark:fill-green-900"/>
+                                    <circle cx="50" cy="50" r="30" fill="#48BB78" class="dark:fill-green-800"/>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Beginner's Guide to Investing</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-500">May 28, 2023</p>
+                            </div>
+                        </a>
+                        <a href="#" class="flex items-center group">
+                            <div class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-md flex-shrink-0 overflow-hidden">
+                                <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                                    <rect width="100" height="100" fill="#FBD38D" class="dark:fill-yellow-900"/>
+                                    <circle cx="50" cy="50" r="30" fill="#F6AD55" class="dark:fill-yellow-800"/>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-medium text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">5 Must-Visit Destinations</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-500">May 20, 2023</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Newsletter -->
+                <div class="bg-blue-50 dark:bg-blue-900/30 rounded-xl shadow-md dark:shadow-gray-900/30 p-6 mb-8">
+                    <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">Subscribe to Newsletter</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">Get the latest posts delivered straight to your inbox.</p>
+                    <form id="newsletter-form" class="space-y-3">
+                        <input type="email" placeholder="Your email address" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200" required>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition duration-300">Subscribe</button>
+                    </form>
+                    <p id="newsletter-message" class="text-sm mt-2 hidden"></p>
+                </div>
+                
+                <!-- Tags -->
+                <div class="bg-white dark:bg-darkcard rounded-xl shadow-md dark:shadow-gray-900/30 p-6">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Tags</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">Productivity</a>
+                        <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">Mindfulness</a>
+                        <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">Technology</a>
+                        <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">Health</a>
+                        <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">Fitness</a>
+                        <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">Food</a>
+                        <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">Travel</a>
+                        <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">Finance</a>
+                        <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">Books</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 dark:bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-xl font-bold mb-4">MyBlog</h4>
+                    <p class="text-gray-400 mb-4">Sharing knowledge and insights on topics that matter to you.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">About</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Articles</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Technology</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Health & Wellness</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Lifestyle</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Travel</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Finance</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">123 Blog Street, City, Country</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mt-1 mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">info@myblog.com</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-phone mt-1 mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">+1 234 567 890</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 MyBlog. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Newsletter Form
+        const newsletterForm = document.getElementById('newsletter-form');
+        const newsletterMessage = document.getElementById('newsletter-message');
+        
+        newsletterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            
+            // Simulate form submission
+            newsletterMessage.textContent = `Thank you! ${email} has been subscribed.`;
+            newsletterMessage.classList.remove('hidden', 'text-red-500');
+            newsletterMessage.classList.add('text-green-500', 'dark:text-green-400');
+            newsletterForm.reset();
+            
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                newsletterMessage.classList.add('hidden');
+            }, 3000);
+        });
+        
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const mobileDarkModeToggle = document.getElementById('mobile-dark-mode-toggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or use system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            html.classList.add('dark');
+            darkModeToggle.checked = true;
+            mobileDarkModeToggle.checked = true;
+            updateToggleIcons(true);
+        }
+        
+        function updateToggleIcons(isDark) {
+            const toggleButtons = document.querySelectorAll('.toggle-button');
+            toggleButtons.forEach(button => {
+                if (isDark) {
+                    button.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    button.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+            });
+        }
+        
+        function toggleDarkMode() {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                updateToggleIcons(false);
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                updateToggleIcons(true);
+            }
+        }
+        
+        darkModeToggle.addEventListener('change', toggleDarkMode);
+        mobileDarkModeToggle.addEventListener('change', () => {
+            darkModeToggle.checked = mobileDarkModeToggle.checked;
+            toggleDarkMode();
+        });
+        
+        // Sync the toggle states
+        darkModeToggle.addEventListener('change', () => {
+            mobileDarkModeToggle.checked = darkModeToggle.checked;
+        });
+        
+        // Update toggle icons on initial load
+        updateToggleIcons(html.classList.contains('dark'));
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'965ce0fbc77edd5b',t:'MTc1MzYyNzA4OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
